@@ -1,0 +1,42 @@
+# Python 빌드 아티팩트
+*.py[cod]
+__pycache__/
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+
+# 가상환경
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.Python
+
+# 파이썬 패키지 매니저 관련
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+
+
+# OS별 불필요 파일
+.DS_Store
+Thumbs.db
+
+# 에디터/IDE 관련
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Django 관련
+local_settings.py
+staticfiles/
+media/
+
+# 환경변수 및 민감정보
+*.env
