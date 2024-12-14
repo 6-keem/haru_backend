@@ -38,7 +38,29 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'haru_backend.app',
+    'drf_spectacular'
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS' : 'drf_spectacular.openapi.AutoSchema'
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE' : '하루(春) API Document',
+    'SWAGGER_UI_SETTINGS': {
+        'dom_id' : '#swagger-ui',
+        'layout' : 'BaseLayout',
+        'deepLinking' : True,
+        'displayOperationId' : True,
+        'filter' : True,
+    },
+    'LICENSE' : {
+        'name' : 'MIT Licence',
+    },
+    'VERSION' : '1.0',
+    'SERVE_INCLUDE_SCHEMA' : False,
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -105,6 +127,7 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
 
 
 # Internationalization
