@@ -4,6 +4,9 @@ from rest_framework import status
 from .models import Word
 from .serializers import WordSerializer
 from drf_spectacular.utils import *
+from django.db.models import QuerySet
+import random
+
 
 def split_words_by_chapter(words, chapter):
     """
@@ -81,6 +84,42 @@ class WordListView(APIView):
             serializer = WordSerializer(words, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
+        except ValueError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            print(f"Error: {str(e)}")
+            return Response({"error": "BAD REQUEST"}, status=status.HTTP_400_BAD_REQUEST)
+
+class TestWordListView(APIView):
+    @extend_schema(
+        summary="시험 단어 조회",
+        responses={
+            status.HTTP_200_OK: WordSerializer(),
+        },
+        parameters=[
+            OpenApiParameter(
+                name='level',
+                type=int,
+                location=OpenApiParameter.QUERY,
+                required=True,
+                description='The JLPT level for filtering words'
+            )
+        ],
+        tags=["단어"]
+    )
+    def get(self, requset):
+        try :
+            level = requset.GET.get('level')
+            level, chapter = validate_level_and_chapter(level, None)
+
+            words = Word.objects.filter(level = level)
+            if isinstance(words, QuerySet) :
+                words = list(words)
+            sample_words = random.sample(words, min(len(words), 50))
+            serializer = WordSerializer(sample_words, many = True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
         except ValueError as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
