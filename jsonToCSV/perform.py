@@ -1,7 +1,7 @@
 import json
 import csv
 
-input_file = 'jlpt.json'
+input_file = './jsonToCSV/jlpt.json'
 
 # JSON 파일 읽기
 with open(input_file, 'r', encoding='utf-8-sig') as f:
@@ -33,26 +33,12 @@ words_fields = [
     'furigana',
     'word_meaning',
     'level',
-    'sentence_id'  # 대표 문장 ID
+    'sentences'  # JSON 문자열로 저장
 ]
 
-# sentence.csv 컬럼 정의
-sentence_fields = [
-    'sentence_id',
-    'kr',
-    'jp'
-]
-
-with open('words.csv', 'w', newline='', encoding='utf-8-sig') as words_file, \
-     open('sentence.csv', 'w', newline='', encoding='utf-8-sig') as sentence_file:
-    
-    words_writer = csv.DictWriter(words_file, fieldnames=words_fields, delimiter='@')
-    sentence_writer = csv.DictWriter(sentence_file, fieldnames=sentence_fields, delimiter='@')
-    
+with open('words.csv', 'w', newline='', encoding='utf-8-sig') as words_file:
+    words_writer = csv.DictWriter(words_file, fieldnames=words_fields, delimiter='@', quotechar='"', quoting=csv.QUOTE_ALL)
     words_writer.writeheader()
-    sentence_writer.writeheader()
-
-    sentence_id_counter = 1
 
     for item in data:
         # word_meaning이 리스트이면 공백으로 join
@@ -61,27 +47,10 @@ with open('words.csv', 'w', newline='', encoding='utf-8-sig') as words_file, \
         else:
             meaning_str = item.get('word_meaning', '')
 
-        sentences = item.get('sentences', [])
-        
-        representative_sentence_id = ''
-        for i, s in enumerate(sentences):
-            kr = s.get('kr', '')
-            jp = s.get('jp', '')
+        # sentences를 JSON 문자열로 변환
+        sentences_json = json.dumps(item.get('sentences', []), ensure_ascii=False)
 
-            current_sentence_id = sentence_id_counter
-            sentence_id_counter += 1
-
-            # 첫 번째 문장을 대표 sentence_id로 사용
-            if i == 0:
-                representative_sentence_id = current_sentence_id
-
-            sentence_row = {
-                'sentence_id': current_sentence_id,
-                'kr': kr,
-                'jp': jp
-            }
-            sentence_writer.writerow(sentence_row)
-
+        # 각 단어 데이터 작성
         words_row = {
             'word_id': item.get('word_id', ''),
             'link': item.get('link', ''),
@@ -91,8 +60,8 @@ with open('words.csv', 'w', newline='', encoding='utf-8-sig') as words_file, \
             'furigana': item.get('furigana', ''),
             'word_meaning': meaning_str,
             'level': item.get('level', ''),
-            'sentence_id': representative_sentence_id
+            'sentences': sentences_json  # JSON 문자열
         }
         words_writer.writerow(words_row)
 
-print("words.csv, sentence.csv 생성 완료!")
+print("words.csv 생성 완료!")
